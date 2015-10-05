@@ -4,52 +4,24 @@ var path = require('path');
 var gulp = require('gulp');
 var conf = require('./conf');
 
-var webpack = require('webpack-stream');
-
-var $ = require('gulp-load-plugins')();
-
-function webpackWrapper(watch, test, callback) {
-    var webpackOptions = {
-        watch: watch,
-        module: {
-            preLoaders: [{test: /\.js$/, exclude: /node_modules/, loader: 'eslint-loader'}],
-            loaders: [{test: /\.js$/, exclude: /node_modules/, loaders: ['ng-annotate', 'babel-loader']}]
-        },
-        output: {filename: conf.module.exportFileName}
-    };
-
-    if (watch) {
-        webpackOptions.devtool = 'inline-source-map';
-    }
-
-    var webpackChangeHandler = function (err, stats) {
-        if (err) {
-            conf.errorHandler('Webpack')(err);
-        }
-        $.util.log(stats.toString({
-            colors: $.util.colors.supportsColor,
-            chunks: false,
-            hash: false,
-            version: false
-        }));
-
-        if (watch) {
-            watch = false;
-            callback();
-        }
-    };
-
-    var sources = [path.join(conf.paths.src, 'main.module.js')];
-
-    if (test) {
-        sources.push(path.join(conf.paths.src, '/module/**/*.spec.js'));
-    }
-
-    return gulp.src(sources)
-        .pipe(webpack(webpackOptions, null, webpackChangeHandler))
-        .pipe(gulp.dest(conf.paths.tmp));
-}
-
-gulp.task('scripts-domain1', function () {
-    return webpackWrapper(false, false);
+var $ = require('gulp-load-plugins')({
+    pattern: ['gulp-*', 'main-bower-files', 'uglify-save-license', 'del']
 });
+
+gulp.task('partials:domain1', function () {
+    return gulp.src([
+        path.join(conf.paths.src, '/partials/*.html')
+    ])
+        .pipe($.minifyHtml({
+            empty: true,
+            spare: true,
+            quotes: true
+        }))
+        .pipe($.angularTemplatecache('templateCacheHtml-domain1.js', {
+            module: 'uiShell.main',
+            root: 'app'
+        }))
+        .pipe(gulp.dest(conf.paths.tmp + '/partials/'));
+});
+
+
