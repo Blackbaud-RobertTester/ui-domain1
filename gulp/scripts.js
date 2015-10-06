@@ -53,7 +53,3 @@ function webpackWrapper(watch, test, callback) {
 gulp.task('scripts:domain1', function () {
     return webpackWrapper(true, false, function(){});
 });
-
-gulp.task('scripts-domain1-watch', function () {
-    return webpackWrapper(true, false);
-});
