@@ -50,6 +50,6 @@ function webpackWrapper(watch, test, callback) {
         .pipe(gulp.dest(path.join(conf.paths.tmp, '/serve/app')));
 }
 
-gulp.task('scripts:domain1', function () {
+gulp.task('scripts:' + conf.module.key , function () {
     return webpackWrapper(true, false, function(){});
 });
